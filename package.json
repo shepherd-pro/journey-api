@@ -1,15 +1,19 @@
 {
   "name": "journey-api",
-  "version": "1.0.50",
+  "version": "0.0.1",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "bun test ./test/**.test.ts",
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
+    "@elysiajs/swagger": "^0.7.4",
+    "drizzle-orm": "^0.29.1",
     "elysia": "latest"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "drizzle-kit": "^0.20.6",
+    "shepherd.js": "^11.2.0"
   },
   "module": "src/index.js"
 }
