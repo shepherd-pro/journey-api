@@ -1,5 +1,5 @@
 {
-  "name": "journey-api",
+  "name": "@shepherdpro/journey-api",
   "version": "0.0.1",
   "scripts": {
     "test": "bun test ./test/**.test.ts",
@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@elysiajs/swagger": "^0.7.4",
+    "dotenv": "^16.3.1",
     "drizzle-orm": "^0.29.1",
     "elysia": "latest"
   },

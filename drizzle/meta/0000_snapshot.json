@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "623c89aa-6ce2-43f7-af5f-cd93522cb3db",
+  "id": "5e44bd10-2a09-4fd7-9625-f1d529210f59",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "journeys": {
@@ -10,9 +10,9 @@
         "id": {
           "name": "id",
           "type": "integer",
-          "primaryKey": false,
+          "primaryKey": true,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": true
         },
         "confirm_cancel_message": {
           "name": "confirm_cancel_message",
@@ -30,28 +30,28 @@
         },
         "default_step_options": {
           "name": "default_step_options",
-          "type": "text",
+          "type": "blob",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "modal_container": {
           "name": "modal_container",
-          "type": "blob",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "steps_container": {
           "name": "steps_container",
-          "type": "blob",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "steps": {
           "name": "steps",
-          "type": "text",
+          "type": "blob",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

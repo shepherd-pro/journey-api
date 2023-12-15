@@ -8,7 +8,6 @@ beforeEach(async () => {
   migrate(db, { migrationsFolder: './drizzle' });
   await db.insert(journeys).values([
     {
-      id: 1,
       confirmCancel: true,
       confirmCancelMessage: 'Are you sure you want to stop the tour?',
       classPrefix: 'shepherd-test',
