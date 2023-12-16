@@ -39,7 +39,7 @@ app.group('/journeys', (app) =>
         await db.delete(journeys).where(eq(journeys.id, Number(id)));
 
         return {
-          message: `Resource deleted successfully!`,
+          message: `Journey deleted successfully!`,
           status: 200
         };
       } catch (e: unknown) {
@@ -52,7 +52,7 @@ app.group('/journeys', (app) =>
     })
     .get('/:id', async ({ params: { id }, set }) => {
       try {
-        const [journey] = await db
+        const [existingJourney] = await db
           .select({
             id: journeys.id,
             tourName: journeys.tourName
@@ -60,7 +60,15 @@ app.group('/journeys', (app) =>
           .from(journeys)
           .where(eq(journeys.id, Number(id)));
 
-        return journey;
+        if (!existingJourney) {
+          set.status = 404;
+          return {
+            message: 'Requested journey was not found!',
+            status: 404
+          };
+        }
+
+        return existingJourney;
       } catch (error) {
         set.status = 404;
         return {
@@ -69,15 +77,17 @@ app.group('/journeys', (app) =>
         };
       }
     })
-    .post('/create', ({ body, set }) => {
+    .post('/', async ({ body, set }) => {
       try {
-        return db
+        const [newJourney] = await db
           .insert(journeys)
           .values(body as JourneyInput)
           .returning({
             id: journeys.id,
             tourName: journeys.tourName
           });
+
+        return newJourney;
       } catch (error) {
         set.status = 500;
         return {
@@ -86,16 +96,26 @@ app.group('/journeys', (app) =>
         };
       }
     })
-    .put('/:id', ({ body, params: { id }, set }) => {
+    .put('/:id', async ({ body, params: { id }, set }) => {
       try {
-        db.update(journeys)
+        const [updatedJourney]: unknown[] = (await db
+          .update(journeys)
           .set(body as JourneyInput)
-          .where(eq(journeys.id, Number(id)));
+          .where(eq(journeys.id, Number(id)))
+          .returning({
+            id: journeys.id,
+            tourName: journeys.tourName
+          })) as TourResponse[];
 
-        return {
-          message: `Journey updated successfully!`,
-          status: 200
-        };
+        if (!updatedJourney) {
+          set.status = 404;
+          return {
+            message: `Journey with id: ${id} was not found.`,
+            status: 404
+          };
+        }
+
+        return updatedJourney;
       } catch (e: unknown) {
         set.status = 500;
         return {
