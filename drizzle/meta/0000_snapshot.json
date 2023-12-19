@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "5e44bd10-2a09-4fd7-9625-f1d529210f59",
+  "id": "0d1980fd-d431-441a-b5ec-008c4571753c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "journeys": {
@@ -11,8 +11,15 @@
           "name": "id",
           "type": "integer",
           "primaryKey": true,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": true
+        },
+        "confirm_cancel": {
+          "name": "confirm_cancel",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "confirm_cancel_message": {
           "name": "confirm_cancel_message",
@@ -30,7 +37,21 @@
         },
         "default_step_options": {
           "name": "default_step_options",
-          "type": "blob",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "exit_on_esc": {
+          "name": "exit_on_esc",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "keyboard_navigation": {
+          "name": "keyboard_navigation",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -49,16 +70,39 @@
           "notNull": false,
           "autoincrement": false
         },
-        "steps": {
-          "name": "steps",
-          "type": "blob",
+        "tour_name": {
+          "name": "tour_name",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "tour_name": {
-          "name": "tour_name",
-          "type": "text",
+        "use_modal_overlay": {
+          "name": "use_modal_overlay",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "steps": {
+      "name": "steps",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "journey_id": {
+          "name": "journey_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false

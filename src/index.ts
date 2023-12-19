@@ -2,7 +2,7 @@ import { Elysia } from 'elysia';
 import { swagger } from '@elysiajs/swagger';
 import { eq } from 'drizzle-orm';
 import { db } from './db';
-import { journeys } from './schema';
+import { journeys, Journey } from './schema';
 
 import Tour from 'shepherd.js/src/types/tour';
 
@@ -10,9 +10,19 @@ interface TourResponse extends Pick<Tour.TourOptions, 'tourName'> {
   id: number;
 }
 
-interface JourneyInput {
-  tourName: string;
-}
+const fieldSelectJourney = {
+  id: journeys.id,
+  tourName: journeys.tourName,
+  modalContainer: journeys.modalContainer,
+  confirmCancel: journeys.confirmCancel,
+  confirmCancelMessage: journeys.confirmCancelMessage,
+  classPrefix: journeys.classPrefix,
+  defaultStepOptions: journeys.defaultStepOptions,
+  exitOnEsc: journeys.exitOnEsc,
+  keyboardNavigation: journeys.keyboardNavigation,
+  stepsContainer: journeys.stepsContainer,
+  useModalOverlay: journeys.useModalOverlay
+};
 
 export const app = new Elysia().use(swagger());
 
@@ -20,11 +30,8 @@ app.group('/journeys', (app) =>
   app
     .delete('/:id', async ({ params: { id }, set }) => {
       try {
-        const [existingJourney]: TourResponse[] = await db
-          .select({
-            id: journeys.id,
-            tourName: journeys.tourName
-          })
+        const [existingJourney] = await db
+          .select(fieldSelectJourney)
           .from(journeys)
           .where(eq(journeys.id, Number(id)));
 
@@ -52,11 +59,9 @@ app.group('/journeys', (app) =>
     })
     .get('/:id', async ({ params: { id }, set }) => {
       try {
-        const [existingJourney] = await db
-          .select({
-            id: journeys.id,
-            tourName: journeys.tourName
-          })
+        // TODO: determine why select ordering matters
+        const [existingJourney]: Journey[] = await db
+          .select(fieldSelectJourney)
           .from(journeys)
           .where(eq(journeys.id, Number(id)));
 
@@ -67,7 +72,7 @@ app.group('/journeys', (app) =>
             status: 404
           };
         }
-
+        console.log(existingJourney, '🐑');
         return existingJourney;
       } catch (error) {
         set.status = 404;
@@ -81,11 +86,8 @@ app.group('/journeys', (app) =>
       try {
         const [newJourney] = await db
           .insert(journeys)
-          .values(body as JourneyInput)
-          .returning({
-            id: journeys.id,
-            tourName: journeys.tourName
-          });
+          .values(body as Omit<TourResponse, 'id'>)
+          .returning(fieldSelectJourney);
 
         return newJourney;
       } catch (error) {
@@ -98,9 +100,9 @@ app.group('/journeys', (app) =>
     })
     .put('/:id', async ({ body, params: { id }, set }) => {
       try {
-        const [updatedJourney]: unknown[] = (await db
+        const [updatedJourney] = (await db
           .update(journeys)
-          .set(body as JourneyInput)
+          .set(body as Omit<TourResponse, 'id'>)
           .where(eq(journeys.id, Number(id)))
           .returning({
             id: journeys.id,
@@ -131,6 +133,6 @@ app.group('/journeys', (app) =>
 
 app.listen(3000, () =>
   console.log(
-    `🐙 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+    `🐙 Journey API is running at ${app.server?.hostname}:${app.server?.port}`
   )
 );
