@@ -9,7 +9,7 @@ import Tour from 'shepherd.js/src/types/tour';
 interface JourneyResponse extends Tour.TourOptions {
   id: number;
 }
-const database = await db();
+
 const fieldSelectJourney = {
   id: journeys.id,
   tourName: journeys.tourName,
@@ -30,7 +30,7 @@ app.group('/journeys', (app) =>
   app
     .delete('/:id', async ({ params: { id }, set }) => {
       try {
-        const [existingJourney] = await database
+        const [existingJourney] = await db
           .select(fieldSelectJourney)
           .from(journeys)
           .where(eq(journeys.id, Number(id)));
@@ -43,7 +43,7 @@ app.group('/journeys', (app) =>
           };
         }
 
-        await database.delete(journeys).where(eq(journeys.id, Number(id)));
+        await db.delete(journeys).where(eq(journeys.id, Number(id)));
 
         return {
           message: `Journey deleted successfully!`,
@@ -59,7 +59,7 @@ app.group('/journeys', (app) =>
     })
     .get('/:id', async ({ params: { id }, set }) => {
       try {
-        const [existingJourney] = await database
+        const [existingJourney] = await db
           .select(fieldSelectJourney)
           .from(journeys)
           .where(eq(journeys.id, Number(id)));
@@ -72,7 +72,7 @@ app.group('/journeys', (app) =>
           };
         }
 
-        const relatedSteps = await database
+        const relatedSteps = await db
           .select()
           .from(steps)
           .where(eq(steps.journeyId, Number(id)));
@@ -92,7 +92,7 @@ app.group('/journeys', (app) =>
     })
     .post('/', async ({ body, set }) => {
       try {
-        const [newJourney] = await database
+        const [newJourney] = await db
           .insert(journeys)
           .values(body as Omit<Journey, 'id'>)
           .returning(fieldSelectJourney);
@@ -108,7 +108,7 @@ app.group('/journeys', (app) =>
     })
     .put('/:id', async ({ body, params: { id }, set }) => {
       try {
-        const [updatedJourney] = (await database
+        const [updatedJourney] = (await db
           .update(journeys)
           .set(body as Omit<Journey, 'id'>)
           .where(eq(journeys.id, Number(id)))

@@ -74,15 +74,12 @@ const newSteps = Array.from({ length: 10 }, (_, idx) => {
 }).flat();
 
 export async function seedDatabase() {
-  const database = await db();
-
   try {
-    await database.insert(journeys).values(newJourneys);
-    await database.insert(steps).values(newSteps);
+    await db.insert(journeys).values(newJourneys);
+    await db.insert(steps).values(newSteps);
   } catch (error) {
     console.log(error, '😈');
   }
 
   console.log(`🌱 Seeding complete.`);
 }
-seedDatabase();

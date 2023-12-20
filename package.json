@@ -2,7 +2,7 @@
   "name": "@shepherdpro/journey-api",
   "version": "0.0.1",
   "scripts": {
-    "test": "bun test --preload ./test/setup.ts",
+    "test": "NODE_ENV=test bun test --preload ./test/setup.ts",
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {

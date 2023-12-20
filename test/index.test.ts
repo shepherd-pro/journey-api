@@ -1,6 +1,19 @@
-import { describe, expect, it } from 'bun:test';
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
+import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
+import { unlink } from 'node:fs/promises';
+import { db, sqlite } from '../src/db';
 import { app } from '../src/index';
-import { newJourneys } from '../src/seed';
+import { newJourneys, seedDatabase } from '../src/seed';
+
+beforeAll(async () => {
+  migrate(db, { migrationsFolder: './drizzle' });
+  await seedDatabase();
+});
+
+afterAll(async () => {
+  await unlink('./journeys.sqlite');
+  sqlite.close();
+});
 
 // localhost:3000/journeys
 const baseUrl = `${app.server?.hostname}:${app.server?.port}/journeys`;
@@ -124,6 +137,23 @@ describe('Journeys Test suite', () => {
 
       const res = await app.fetch(req);
       expect(res.status).not.toEqual(200);
+    });
+  });
+});
+
+describe('Steps Test suite', () => {
+  describe('GET Steps', () => {
+    it('should return steps successfully using existing journey id', async () => {
+      const id = 1;
+
+      const req = new Request(`${baseUrl}/${id}`);
+      const res = await app.fetch(req);
+      expect(res.status).toEqual(200);
+
+      const responseBody = await res.json();
+
+      expect(responseBody.steps.length).toEqual(5);
+      expect(responseBody.steps[0].journeyId).toEqual(id);
     });
   });
 });

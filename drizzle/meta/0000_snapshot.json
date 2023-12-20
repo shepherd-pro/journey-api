@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "2d2d3a29-0577-4235-b508-1db499d7d1d5",
+  "id": "37772b37-cbd8-4863-a917-2aafb6a9784a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "journeys": {
