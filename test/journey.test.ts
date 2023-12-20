@@ -1,19 +1,6 @@
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
-import { unlink } from 'node:fs/promises';
+import { describe, expect, it } from 'bun:test';
 import { app } from '../src/index';
-import { db, sqlite } from '../src/db';
-import { newJourneys, seedDatabase } from '../src/seed';
-
-beforeAll(async () => {
-  migrate(db, { migrationsFolder: './drizzle' });
-  await seedDatabase();
-});
-
-afterAll(async () => {
-  await unlink('./test.sqlite');
-  sqlite.close();
-});
+import { newJourneys } from '../src/seed';
 
 // localhost:3000/journeys
 const baseUrl = `${app.server?.hostname}:${app.server?.port}/journeys`;
@@ -21,8 +8,8 @@ const baseUrl = `${app.server?.hostname}:${app.server?.port}/journeys`;
 describe('Journeys Test suite', () => {
   describe('GET Journeys', () => {
     it('should return a journey successfully using existing id', async () => {
-      const id = 1;
       const seededJourney = newJourneys[0];
+      const id = seededJourney.id;
 
       const req = new Request(`${baseUrl}/${id}`);
       const res = await app.fetch(req);
@@ -30,7 +17,7 @@ describe('Journeys Test suite', () => {
 
       const responseBody = await res.json();
 
-      expect(responseBody.id).toEqual(1);
+      expect(responseBody.id).toEqual(id);
       expect(responseBody.tourName).toEqual(seededJourney.tourName);
     });
 

@@ -1,5 +1,6 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import { sqliteTable, text, integer, blob } from 'drizzle-orm/sqlite-core';
+import { createId } from '@paralleldrive/cuid2';
 
 export const journeys = sqliteTable('journeys', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -18,28 +19,32 @@ export const journeys = sqliteTable('journeys', {
 export type Journey = InferSelectModel<typeof journeys>;
 
 export const steps = sqliteTable('steps', {
-  id: integer('id').notNull().primaryKey(),
-  journeyId: integer('journey_id').notNull()
-  // attachTo: blob('attach_to', { mode: 'json' }),
-  // advanceOn: blob('advance_on', { mode: 'json' }),
-  // arrow: integer('arrow', { mode: 'boolean' }),
-  // beforeShowPromise: text('before_show_promise'),
-  // buttons: text('buttons', { mode: 'json' }),
-  // cancelIcon: text('cancel_icon', { mode: 'json' }),
-  // canClickTarget: integer('can_click_target', { mode: 'boolean' }),
-  // classes: text('classes'),
-  // highlightClass: text('highlight_class'),
-  // modalOverlayOpeningPadding: integer('modal_overlay_opening_padding'),
-  // modalOverlayOpeningRadius: text('modal_overlay_opening_radius', {
-  //   mode: 'json'
-  // }),
-  // floatingUIOptions: text('floating_ui_options', { mode: 'json' }),
-  // scrollTo: integer('scroll_to', { mode: 'boolean' }),
-  // scrollToHandler: text('scroll_to_handler'),
-  // showOn: text('show_on', { mode: 'json' }),
-  // text: text('text'),
-  // title: text('title'),
-  // when: text('when', { mode: 'json' })
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  journeyId: integer('journey_id')
+    .notNull()
+    .references(() => journeys.id),
+  attachTo: text('attach_to', { mode: 'json' }),
+  advanceOn: text('advance_on', { mode: 'json' }),
+  arrow: integer('arrow', { mode: 'boolean' }),
+  beforeShowPromise: text('before_show_promise'),
+  buttons: text('buttons', { mode: 'json' }),
+  cancelIcon: text('cancel_icon', { mode: 'json' }),
+  canClickTarget: integer('can_click_target', { mode: 'boolean' }),
+  classes: text('classes'),
+  highlightClass: text('highlight_class'),
+  modalOverlayOpeningPadding: integer('modal_overlay_opening_padding'),
+  modalOverlayOpeningRadius: text('modal_overlay_opening_radius', {
+    mode: 'json'
+  }),
+  floatingUIOptions: text('floating_ui_options', { mode: 'json' }),
+  scrollTo: integer('scroll_to', { mode: 'boolean' }),
+  scrollToHandler: text('scroll_to_handler'),
+  showOn: text('show_on', { mode: 'json' }),
+  text: text('text'),
+  title: text('title'),
+  when: text('when', { mode: 'json' })
 });
 
 export type Step = InferSelectModel<typeof steps>;

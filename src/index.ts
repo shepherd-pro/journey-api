@@ -2,14 +2,14 @@ import { Elysia } from 'elysia';
 import { swagger } from '@elysiajs/swagger';
 import { eq } from 'drizzle-orm';
 import { db } from './db';
-import { journeys, Journey } from './schema';
+import { journeys, Journey, steps, Step } from './schema';
 
 import Tour from 'shepherd.js/src/types/tour';
 
-interface TourResponse extends Pick<Tour.TourOptions, 'tourName'> {
+interface JourneyResponse extends Tour.TourOptions {
   id: number;
 }
-
+const database = await db();
 const fieldSelectJourney = {
   id: journeys.id,
   tourName: journeys.tourName,
@@ -30,7 +30,7 @@ app.group('/journeys', (app) =>
   app
     .delete('/:id', async ({ params: { id }, set }) => {
       try {
-        const [existingJourney] = await db
+        const [existingJourney] = await database
           .select(fieldSelectJourney)
           .from(journeys)
           .where(eq(journeys.id, Number(id)));
@@ -43,7 +43,7 @@ app.group('/journeys', (app) =>
           };
         }
 
-        await db.delete(journeys).where(eq(journeys.id, Number(id)));
+        await database.delete(journeys).where(eq(journeys.id, Number(id)));
 
         return {
           message: `Journey deleted successfully!`,
@@ -59,8 +59,7 @@ app.group('/journeys', (app) =>
     })
     .get('/:id', async ({ params: { id }, set }) => {
       try {
-        // TODO: determine why select ordering matters
-        const [existingJourney]: Journey[] = await db
+        const [existingJourney] = await database
           .select(fieldSelectJourney)
           .from(journeys)
           .where(eq(journeys.id, Number(id)));
@@ -72,9 +71,18 @@ app.group('/journeys', (app) =>
             status: 404
           };
         }
-        console.log(existingJourney, '🐑');
-        return existingJourney;
+
+        const relatedSteps = await database
+          .select()
+          .from(steps)
+          .where(eq(steps.journeyId, Number(id)));
+
+        return {
+          ...existingJourney,
+          steps: relatedSteps
+        };
       } catch (error) {
+        console.log(error);
         set.status = 404;
         return {
           message: 'Unable to find Journey!',
@@ -84,9 +92,9 @@ app.group('/journeys', (app) =>
     })
     .post('/', async ({ body, set }) => {
       try {
-        const [newJourney] = await db
+        const [newJourney] = await database
           .insert(journeys)
-          .values(body as Omit<TourResponse, 'id'>)
+          .values(body as Omit<Journey, 'id'>)
           .returning(fieldSelectJourney);
 
         return newJourney;
@@ -100,14 +108,14 @@ app.group('/journeys', (app) =>
     })
     .put('/:id', async ({ body, params: { id }, set }) => {
       try {
-        const [updatedJourney] = (await db
+        const [updatedJourney] = (await database
           .update(journeys)
-          .set(body as Omit<TourResponse, 'id'>)
+          .set(body as Omit<Journey, 'id'>)
           .where(eq(journeys.id, Number(id)))
           .returning({
             id: journeys.id,
             tourName: journeys.tourName
-          })) as TourResponse[];
+          })) as JourneyResponse[];
 
         if (!updatedJourney) {
           set.status = 404;
