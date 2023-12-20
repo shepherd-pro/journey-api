@@ -1,45 +1,17 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
-import { app } from '../src/index';
+import { unlink } from 'node:fs/promises';
 import { db, sqlite } from '../src/db';
-import { journeys } from '../src/schema';
+import { app } from '../src/index';
+import { newJourneys, seedDatabase } from '../src/seed';
 
 beforeAll(async () => {
   migrate(db, { migrationsFolder: './drizzle' });
-  await db.insert(journeys).values([
-    {
-      id: 1,
-      confirmCancel: true,
-      confirmCancelMessage: 'Are you sure you want to stop the tour?',
-      classPrefix: 'shepherd-test',
-      defaultStepOptions: {
-        scrollTo: true
-      },
-      exitOnEsc: true,
-      keyboardNavigation: true,
-      modalContainer: 'body',
-      stepsContainer: 'body',
-      steps: [
-        {
-          id: 'welcome',
-          options: {
-            attachTo: {
-              element: '.welcome',
-              on: 'bottom'
-            },
-            text: 'Welcome to Elysia!'
-          }
-        }
-      ],
-      tourName: 'test',
-      useModalOverlay: true
-    }
-  ]);
-
-  console.log(`🌱 Seeding complete.`);
+  await seedDatabase();
 });
 
-afterAll(() => {
+afterAll(async () => {
+  await unlink('./journeys.sqlite');
   sqlite.close();
 });
 
@@ -49,7 +21,8 @@ const baseUrl = `${app.server?.hostname}:${app.server?.port}/journeys`;
 describe('Journeys Test suite', () => {
   describe('GET Journeys', () => {
     it('should return a journey successfully using existing id', async () => {
-      const id = '1';
+      const seededJourney = newJourneys[0];
+      const id = seededJourney.id;
 
       const req = new Request(`${baseUrl}/${id}`);
       const res = await app.fetch(req);
@@ -57,12 +30,12 @@ describe('Journeys Test suite', () => {
 
       const responseBody = await res.json();
 
-      expect(responseBody.id).toEqual(1);
-      expect(responseBody.tourName).toEqual('test');
+      expect(responseBody.id).toEqual(id);
+      expect(responseBody.tourName).toEqual(seededJourney.tourName);
     });
 
     it('should fail to return a journey that does not exist', async () => {
-      const journeyId = '2';
+      const journeyId = 20;
 
       const req = new Request(`${baseUrl}/${journeyId}`);
       const res = await app.fetch(req);
@@ -74,8 +47,8 @@ describe('Journeys Test suite', () => {
   describe('POST Journeys', () => {
     it('should create a journey successfully', async () => {
       const newJourney = {
-        id: 2,
-        tourName: 'test'
+        id: 11,
+        tourName: 'Made in Test'
       };
       const req = new Request(baseUrl, {
         method: 'POST',
@@ -89,19 +62,19 @@ describe('Journeys Test suite', () => {
 
       const responseBody = await res.json();
 
-      expect(responseBody.id).toEqual(2);
-      expect(responseBody.tourName).toEqual('test');
+      expect(responseBody.id).toEqual(newJourney.id);
+      expect(responseBody.tourName).toEqual(newJourney.tourName);
     });
   });
 
   describe('PUT Journeys', () => {
     it('should update a journey successfully', async () => {
       const originalJourney = {
-        tourName: 'test'
+        tourName: newJourneys[1].tourName
       };
 
       const updatedJourney = {
-        tourName: 'updated test'
+        tourName: 'Updated in test'
       };
 
       const journeyId = 2;
@@ -128,7 +101,7 @@ describe('Journeys Test suite', () => {
         tourName: 'bun bun bun'
       };
 
-      const journeyId = 3;
+      const journeyId = 13;
 
       const req = new Request(`${baseUrl}/${journeyId}`, {
         method: 'PUT',
@@ -156,7 +129,7 @@ describe('Journeys Test suite', () => {
     });
 
     it('should fail to delete a Journey that does not exist', async () => {
-      const journeyId = 3;
+      const journeyId = 13;
 
       const req = new Request(`${baseUrl}/${journeyId}`, {
         method: 'DELETE'
@@ -164,6 +137,23 @@ describe('Journeys Test suite', () => {
 
       const res = await app.fetch(req);
       expect(res.status).not.toEqual(200);
+    });
+  });
+});
+
+describe('Steps Test suite', () => {
+  describe('GET Steps', () => {
+    it('should return steps successfully using existing journey id', async () => {
+      const id = 1;
+
+      const req = new Request(`${baseUrl}/${id}`);
+      const res = await app.fetch(req);
+      expect(res.status).toEqual(200);
+
+      const responseBody = await res.json();
+
+      expect(responseBody.steps.length).toEqual(5);
+      expect(responseBody.steps[0].journeyId).toEqual(id);
     });
   });
 });

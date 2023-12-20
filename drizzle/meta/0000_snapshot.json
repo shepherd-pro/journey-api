@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "5e44bd10-2a09-4fd7-9625-f1d529210f59",
+  "id": "37772b37-cbd8-4863-a917-2aafb6a9784a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "journeys": {
@@ -11,8 +11,15 @@
           "name": "id",
           "type": "integer",
           "primaryKey": true,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": true
+        },
+        "confirm_cancel": {
+          "name": "confirm_cancel",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "confirm_cancel_message": {
           "name": "confirm_cancel_message",
@@ -30,7 +37,21 @@
         },
         "default_step_options": {
           "name": "default_step_options",
-          "type": "blob",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "exit_on_esc": {
+          "name": "exit_on_esc",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "keyboard_navigation": {
+          "name": "keyboard_navigation",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -49,23 +70,186 @@
           "notNull": false,
           "autoincrement": false
         },
-        "steps": {
-          "name": "steps",
-          "type": "blob",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "tour_name": {
           "name": "tour_name",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "use_modal_overlay": {
+          "name": "use_modal_overlay",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "steps": {
+      "name": "steps",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "journey_id": {
+          "name": "journey_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "attach_to": {
+          "name": "attach_to",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "advance_on": {
+          "name": "advance_on",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "arrow": {
+          "name": "arrow",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "before_show_promise": {
+          "name": "before_show_promise",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "buttons": {
+          "name": "buttons",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cancel_icon": {
+          "name": "cancel_icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "can_click_target": {
+          "name": "can_click_target",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "classes": {
+          "name": "classes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "highlight_class": {
+          "name": "highlight_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modal_overlay_opening_padding": {
+          "name": "modal_overlay_opening_padding",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modal_overlay_opening_radius": {
+          "name": "modal_overlay_opening_radius",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "floating_ui_options": {
+          "name": "floating_ui_options",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "scroll_to": {
+          "name": "scroll_to",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "scroll_to_handler": {
+          "name": "scroll_to_handler",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "show_on": {
+          "name": "show_on",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "when": {
+          "name": "when",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "steps_journey_id_journeys_id_fk": {
+          "name": "steps_journey_id_journeys_id_fk",
+          "tableFrom": "steps",
+          "tableTo": "journeys",
+          "columnsFrom": [
+            "journey_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     }
